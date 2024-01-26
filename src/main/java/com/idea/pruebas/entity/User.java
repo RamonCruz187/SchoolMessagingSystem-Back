@@ -1,13 +1,12 @@
 package com.idea.pruebas.entity;
 
 import com.idea.pruebas.enums.RoleUser;
+import com.idea.pruebas.repository.CourseRepository;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -19,16 +18,20 @@ public class User  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
 
     private String username;
 
-    @ElementCollection
-    private List<String> childName = new ArrayList<>();
+    @OneToMany (targetEntity = Student.class, mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Student> students;
 
-    @ManyToMany (mappedBy = "users")
-    private List <Course> courses;
+
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_course", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id")
+    )
+    private List<Course> courses;
 
     @ManyToMany (mappedBy = "users")
     private List <Message> messages;
@@ -38,6 +41,7 @@ public class User  {
     private  String password;
 
     @Enumerated(EnumType.STRING)
-    RoleUser role;
+    private RoleUser role;
+
 
 }

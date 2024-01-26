@@ -6,6 +6,9 @@ import com.idea.pruebas.entity.*;
 import com.idea.pruebas.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -41,6 +44,12 @@ public class Controller {
 
     @Autowired
     MessageService messageService;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    StudentRepository studentRepository;
 
 
     @GetMapping("/schoolList")
@@ -116,4 +125,42 @@ public class Controller {
     void deleteMessage(@PathVariable Long messageId){
         messageService.deleteMessage(messageId);
     }
+
+    @PostMapping("/newUser")
+    public void newUser(@RequestBody UserRequestCreateDto userRequestCreateDto){
+        User user = User.builder()
+                .username(userRequestCreateDto.username)
+                .email(userRequestCreateDto.email)
+                .password(userRequestCreateDto.password)
+                .role(userRequestCreateDto.role)
+                .build();
+        userRepository.save(user);
+    }
+
+    @PostMapping("/newUserCourse/{userId}")
+    public void newUserCourse(@PathVariable Long userId, @RequestBody UserRequestCourseDto userRequestCourseDto){
+       Student student= new Student();
+       student.setUser(userRepository.getReferenceById(userId));
+       student.setName(userRequestCourseDto.student);
+       studentRepository.save(student);
+       User user = userRepository.getReferenceById(userId);
+       user.getCourses().add(courseRepository.getReferenceById(userRequestCourseDto.course));
+       userRepository.save(user);
+
+
+    }
+
+    @GetMapping("/MessageList/{userId}")
+    public List <MessageResponseDto> messageList(@ PathVariable Long userId){
+        User user = userRepository.getReferenceById(userId);
+        List <Course> courses = user.getCourses();
+        List <MessageResponseDto> messages = new ArrayList<>();
+        for(Course course : courses){
+            messages.addAll(course.getMessages().stream().map(MessageResponseDto::new).toList());
+
+        }
+        return messages;
+    }
+
 }
+

@@ -33,11 +33,8 @@ public class Course {
     @ManyToMany(mappedBy = "courses")
     private List<Message> messages;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "course_user", joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-    )
-    private List<User> users;
+
+    @ManyToMany (mappedBy = "courses")
+    private List <User> users;
 
 }

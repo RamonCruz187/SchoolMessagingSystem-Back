@@ -23,7 +23,7 @@ public class MessageRequestCreateDto implements Serializable {
 
     public Long id_receptor;
 
-    public MessageRequestCreateDto(Message message, String receptor, Long id_receptor) {
+    public MessageRequestCreateDto(Message message) {
         this.message = message.getMessage();
         this.expiration = message.getExpiration();
 
